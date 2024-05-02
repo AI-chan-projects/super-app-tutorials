@@ -1,0 +1,8 @@
+# $ conda env create -f environment.yml
+name: ssh
+dependencies:
+  - python=3.8
+  - paramiko
+  - cryptography
+  # 다른 필요한 패키지들도 여기에 추가할 수 있습니다.
+# $ conda activate ssh
