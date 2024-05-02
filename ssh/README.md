@@ -7,8 +7,11 @@
 [Super-App-Tutorials 레포지토리의 목적 📝](https://github.com/AI-chan-projects/super-app-tutorials/blob/main/README.md)
 
 Super-App-Tutorials 시리즈의 첫 번째 앱입니다! 🥳
+
 SSH 클라이언트를 만들어 보면서 구성 요소와 동작 방식을 확인해 봅시다. 🧠
+
 실제로 동작하는 코드를 만들어 활용해 보면서, 인사이트를 얻어봅시다! 💡
+
 각자 자신있는 개발 언어(C, Java, Python, Rust...)로 제작합시다! 🔧
 
 ## QuickStart
