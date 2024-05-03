@@ -37,11 +37,28 @@ else:
     password = getpass("password: ")
     client.connect(hostname, port=port, username=username, password=password)
 
-# 원격 명령 실행
-stdin, stdout, stderr = client.exec_command('ls')
+# 원격 서버에 터미널 세션을 열기
+channel = client.invoke_shell()
 
-# 명령 출력 읽기
-print(stdout.read().decode())
+print("터미널 세션에 연결되었습니다. 명령을 입력하세요.")
 
-# 연결 종료
+# 터미널 입력 및 출력 처리
+while True:
+    # 사용자가 입력한 명령을 채널에 보내기
+    command = input("$ ")
+    if command.lower() in ['exit', 'quit']:
+        break
+    channel.send(command + "\n")
+    
+    # 원격 서버에서 응답을 받기
+    while not channel.recv_ready():
+        pass  # 응답 대기
+    output = channel.recv(1024).decode()
+    
+    # 원격 서버 응답 출력
+    print(output)
+
+# 채널 및 SSH 연결 종료
+channel.close()
 client.close()
+print("터미널 세션이 종료되었습니다.")
