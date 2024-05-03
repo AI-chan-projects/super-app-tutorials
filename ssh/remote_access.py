@@ -1,20 +1,25 @@
 import paramiko
 import logging
 from getpass import getpass
+import argparse  # argparse 모듈 추가
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)  # 로그 레벨을 INFO로 설정
 logger = logging.getLogger(__name__)
 
-def info_setting(explanations):
-    constants = input(explanations)
-    logger.info(f"Input received for {explanations.strip(':')}: {constants}")
-    return constants
+# argparse를 사용하여 명령줄 인자를 처리
+parser = argparse.ArgumentParser(description="Remote SSH Access Script")
+parser.add_argument("--hostname", type=str, required=True, help="Hostname of the remote server")
+parser.add_argument("--port", type=int, default=22, help="Port number of the remote server")
+parser.add_argument("--username", type=str, required=True, help="Username for remote server")
+parser.add_argument("--pkey", type=str, help="Path to private key file for public key authentication")
 
-hostname = str(info_setting("hostname: "))
-port = int(info_setting("port number: "))
-username = str(info_setting("user name: "))
-password = getpass("password: ")
+args = parser.parse_args()  # 명령줄 인자 파싱
+
+hostname = args.hostname
+port = args.port
+username = args.username
+pkey_path = args.pkey  # 공개 키 경로를 가져옴
 
 # SSH 클라이언트 생성
 client = paramiko.SSHClient()
@@ -22,8 +27,15 @@ client = paramiko.SSHClient()
 # 기본 설정: 호스트 키 자동 승인
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-# 원격 서버에 연결
-client.connect(hostname, port=port, username=username, password=password)
+# 인증 방식 설정
+if pkey_path:
+    # 공개 키 인증 사용
+    private_key = paramiko.RSAKey.from_private_key_file(pkey_path)
+    client.connect(hostname, port=port, username=username, pkey=private_key)
+else:
+    # 공개 키 인증이 아닌 경우, 비밀번호를 getpass로 안전하게 입력받음
+    password = getpass("password: ")
+    client.connect(hostname, port=port, username=username, password=password)
 
 # 원격 명령 실행
 stdin, stdout, stderr = client.exec_command('ls')

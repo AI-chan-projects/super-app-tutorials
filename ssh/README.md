@@ -30,7 +30,7 @@ SSH 클라이언트를 만들어 보면서 구성 요소와 동작 방식을 확
             ```
         - 파이썬 main.py를 실행합니다.
             ```bash
-            $ python main.py
+            $ python main.py [-h] --hostname HOSTNAME [--port PORT] --username USERNAME [--pkey PKEY]
             ```
 
 ## 사용 방법
