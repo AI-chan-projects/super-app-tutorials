@@ -1,5 +1,6 @@
 import paramiko
 import logging
+from getpass import getpass
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)  # 로그 레벨을 INFO로 설정
@@ -13,7 +14,7 @@ def info_setting(explanations):
 hostname = str(info_setting("hostname: "))
 port = int(info_setting("port number: "))
 username = str(info_setting("user name: "))
-password = str(info_setting("password: "))
+password = getpass("password: ")
 
 # SSH 클라이언트 생성
 client = paramiko.SSHClient()
