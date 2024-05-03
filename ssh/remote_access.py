@@ -42,6 +42,13 @@ channel = client.invoke_shell()
 
 print("터미널 세션에 연결되었습니다. 명령을 입력하세요.")
 
+# 접속 직후 Welcome 메시지 출력
+# 채널에서 데이터를 즉시 수신하고 출력
+while not channel.recv_ready():
+    pass  # 응답 대기
+output = channel.recv(1024).decode()
+print(output)
+
 # 터미널 입력 및 출력 처리
 while True:
     # 사용자가 입력한 명령을 채널에 보내기
