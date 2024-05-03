@@ -2,6 +2,8 @@ import paramiko
 import logging
 from getpass import getpass
 import argparse  # argparse 모듈 추가
+from collections import deque
+import time
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)  # 로그 레벨을 INFO로 설정
@@ -41,29 +43,31 @@ else:
 channel = client.invoke_shell()
 
 print("터미널 세션에 연결되었습니다. 명령을 입력하세요.")
-
-# 접속 직후 Welcome 메시지 출력
-# 채널에서 데이터를 즉시 수신하고 출력
-while not channel.recv_ready():
-    pass  # 응답 대기
-output = channel.recv(1024).decode()
-print(output)
+output_queue = deque()  # 큐 방식으로 처리하기 위해 deque 생성
 
 # 터미널 입력 및 출력 처리
 while True:
     # 사용자가 입력한 명령을 채널에 보내기
-    command = input("$ ")
+    command = input()
     if command.lower() in ['exit', 'quit']:
         break
     channel.send(command + "\n")
+
+    # 루프 내에서 대기 시간을 조절하여 폴링 주기를 설정
+    time.sleep(0.05)  # 0.05초 대기
     
     # 원격 서버에서 응답을 받기
     while not channel.recv_ready():
         pass  # 응답 대기
-    output = channel.recv(1024).decode()
-    
-    # 원격 서버 응답 출력
-    print(output)
+
+    # 데이터를 수신하여 `output_queue`에 추가
+    while channel.recv_ready():
+        data = channel.recv(1024).decode()  # 수신한 데이터 디코딩
+        output_queue.append(data)  # 데이터를 deque에 추가
+
+    while output_queue:
+        output = output_queue.popleft()  # 큐의 앞쪽에서 데이터를 꺼냄
+        print(output, end='')
 
 # 채널 및 SSH 연결 종료
 channel.close()
